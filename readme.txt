@@ -9,6 +9,15 @@ https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
 This implementation shifts characters on the ascii table between ascii values 32(space) and 126 (~). This leaves other characters like new line alone.
 
 -- Current Lanquages --
+        
+c ~ using python 3.4
+     - done
+        * core logic
+     - todo 
+        * command line interface
+        * file operations
+        * make file
+        * gui interface
 java ~ using jdk 7+
      - done
         * core logic
@@ -26,6 +35,5 @@ python ~ using python 3.4
      - todo 
         * gui interface
 -- TODO --
-c
 javascript
 lisp
