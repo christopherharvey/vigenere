@@ -1,4 +1,5 @@
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
@@ -9,11 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main{
-    static boolean verbose = false;
     public static void main(String [ ] args)
     {
         boolean encrypt = false;
         boolean decrypt = false;
+        char mode = 'e';
         String password = null;
         String input_text = null;
         String input_file_name = null;
@@ -23,9 +24,11 @@ public class main{
             switch(option){
                 case "-e":
                     encrypt = true;
+                    mode = 'e';
                     break;
                 case "-d":
                     decrypt = true;
+                    mode = 'd';
                     break;
                 case "-p":
                     i = i+1;
@@ -46,9 +49,10 @@ public class main{
                 case "-h":
                 case "--help":
                     System.out.println("Options:");
+                    System.out.println("\t-e        : Encrypt input. This flag is set by default.");
+                    System.out.println("\t-d        : Decrypt input.");
                     System.out.println("\t-p        : Password. If none is given password is pulled from input.");
-                    System.out.println("\t-i        : Input file name. If no input is used text is pulled from input.");
-                    System.out.println("\t-t        : Input text as a string. If both input file name and input text are used, input file takes precedence If no input is used text is pulled from input.");
+                    System.out.println("\t-i        : Input file name. If no input is used text is pulled from standard input.");
                     System.out.println("\t-o        : Output file name. If no output is used text is printed.");
                     System.out.println("\t-h,--help : Output file name.");
                     return;
@@ -63,18 +67,8 @@ public class main{
                     return;
             }
         }
-        while(!encrypt && !decrypt){
-            System.out.println("Please choose encrypt(e) or decrypt(d).");
-            Scanner scanner = new Scanner(System.in);
-            String response = scanner.next();
-            if(response.equals("e")||response.equals("E")){
-                encrypt = true;
-            }else if(response.equals("d")||response.equals("D")){
-                decrypt = true;
-            }
-        }
         if(password == null){
-            System.out.println("Please enter a password, then press enter.");
+            System.err.println("Please enter a password, then press enter.");
             Scanner scanner = new Scanner(System.in);
             password = scanner.next();
         }
@@ -99,18 +93,17 @@ public class main{
             }
         }
         if(input_text == null){
-            System.out.println("Please enter a text, then press enter. For multi line text please use an input file with the -i option.");
-            Scanner scanner = new Scanner(System.in);
-            input_text = scanner.next();
+            System.err.println("Please enter a text, then press enter. Enter an empty line to quit.");
+            Scanner scanner = new Scanner(new BufferedInputStream(System.in));
+            input_text = "";
+            String tmp;
+            while((tmp = scanner.nextLine()) != null && tmp.length()!=0){
+                input_text += tmp+'\n';
+            }
         }
         String output = "";
-        if(encrypt){
-            Vigenere vigenere = new Vigenere();
-            output = vigenere.encrypt(password,input_text);
-        }else if(decrypt){
-            Vigenere vigenere = new Vigenere();
-            output = vigenere.decrypt(password,input_text);
-        }
+        Vigenere vigenere = new Vigenere();
+        output = vigenere.shiftString(password,input_text,mode);
         if(output_file_name == null){
             System.out.println(output);
         }else{
@@ -126,10 +119,9 @@ public class main{
     }
     public static void test0(String key,String text){
         Vigenere vigenere = new Vigenere();
-        String e = vigenere.encrypt(key,text);
-        if(verbose)
-            System.out.println(e);
-        String d = vigenere.decrypt(key,e);
+        String e = vigenere.shiftString(key,text,'e');
+        String d = vigenere.shiftString(key,e,'d');
+        System.out.println("TEST ENCRYPT:"+e);
         System.out.println((text.equals(d)?"PASS::"+d:"FAIL"+":SHOULD BE-"+text+":IS-"+d));
     }
 }

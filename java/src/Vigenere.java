@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
  * Created by postmordum on 6/29/15.
  */
 public class Vigenere {
-    String encrypt(String key,String text){
+    String shiftString(String key,String text,char mode){
         int kp = 0;
         String encrypt = "";
         for(int i=0;i<text.length();i++){
@@ -16,47 +16,50 @@ public class Vigenere {
             }
             char t = text.charAt(i);
             char c = key.charAt(kp++);
-            char e = this.shiftForward(c,t);
-            //System.out.println(t+":"+c+":"+e);
+            char e = this.shiftChar(c,t,mode);
             encrypt += e;
         }
         return encrypt;
     }
-    String decrypt(String key,String text){
-        int kp = 0;
-        String decrypt = "";
-        for(int i=0;i<text.length();i++){
-            if(kp >= key.length()){
-                kp = 0;
-            }
-            char t = text.charAt(i);
-            char c = key.charAt(kp++);
-            char d = this.shiftBackword(c,t);
-            decrypt += d;
-        }
-        return decrypt;
+    private int getOffset(char input)
+    {
+	    int offset = -1;
+	    if(input>='A'&&input<='Z'){
+		    offset = 'A';
+	    }else if(input>='a'&&input<='z'){
+		    offset = 'a';
+	    }else if(input>='0'&&input<='9'){
+		    offset = '0';
+	    }
+	    return offset;
     }
-    private char shiftForward(char shift,char ltr){
-        int shifted = ltr;
-        if(ltr>31&&ltr<127){
-            shifted = (ltr + shift);
-            while(shifted > 126){
-                int gap = shifted - 126;
-                shifted = gap + 31;
-            }
-        }
-        return (char)shifted;
+    private int getModulo(char input){
+	    int modulo = -1;
+	    if(input>='A'&&input<='Z'){
+		    modulo = 26;
+	    }else if(input>='a'&&input<='z'){
+		    modulo = 26;
+	    }else if(input>='0'&&input<='9'){
+		    modulo = 10;
+	    }
+	    return modulo;
     }
-    private char shiftBackword(char shift,char ltr){
-        int shifted = ltr;
-        if(ltr>31&&ltr<127){
-            shifted = (ltr - shift);
-            while(shifted < 32){
-                int gap = 32 - shifted;
-                shifted = 127 - gap;
+    private char shiftChar(char shift, char ltr,char mode){
+        int offset = this.getOffset(ltr);
+        int modulo = this.getModulo(ltr);
+        if(offset > 0){
+            int a = ltr - offset;
+            int s = shift - this.getOffset(shift);
+            if(mode == 'd'){
+                s *= -1;
             }
+            int r = (a+s)%modulo;
+		    if(r<0)
+			    r += modulo;
+			return (char) (r + offset);
+        }else{
+            return ltr;
         }
-        return (char)shifted;
     }
 }
 
