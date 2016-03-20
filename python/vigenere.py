@@ -1,27 +1,38 @@
 
+def getOffset(charNum):
+    offset = -1
+    if charNum>=ord('A') and charNum<=ord('Z'):
+        offset = ord('A')
+    elif charNum>=ord('a') and charNum<=ord('z'):
+        offset = ord('a')
+    elif charNum>=ord('0') and charNum<=ord('9'):
+        offset = ord('0')
 
-
-def shiftForward(shift,letter):
-    shift_num = ord(shift)
-    letter_num = ord(letter)
-    shifted_num = letter_num
-    if letter_num>31 and letter_num<127:
-        shifted_num = (letter_num + shift_num)
-        while shifted_num > 126:
-            gap = shifted_num - 126
-            shifted_num = gap + 31
-    return chr(shifted_num)
+    return offset
     
-def shiftBackward(shift,letter):
-    shift_num = ord(shift)  
-    letter_num = ord(letter)
-    shifted_num = letter_num
-    if letter_num>31 and letter_num<127:
-        shifted_num = (letter_num - shift_num)
-        while shifted_num < 32:
-            gap = 32 - shifted_num
-            shifted_num = 127 - gap
-    return chr(shifted_num)
+def getModulo(charNum):
+    modulo = -1
+    if charNum>=ord('A') and charNum<=ord('Z'):
+        modulo = 26
+    elif charNum>=ord('a') and charNum<=ord('z'):
+        modulo = 26
+    elif charNum>=ord('0') and charNum<=ord('9'):
+        modulo = 10
+
+    return modulo
+    
+def shiftChar(numericKey,ascii):
+    shifted = ascii;
+    offset = getOffset(ascii)
+    modulo = getModulo(ascii)
+    if offset>0:
+        alpha = ascii - offset
+        s = (alpha+numericKey)%modulo
+        if s<0:
+            s += modulo
+        shifted = s+offset
+
+    return shifted
     
 def vigenere(key,text,decrypt=None):
     if decrypt == None:
@@ -30,12 +41,11 @@ def vigenere(key,text,decrypt=None):
     key_len = len(key)
     for i,t in enumerate(text):
         kp = i%key_len;
-        c = key[kp];
+        c = ord(key[kp]);
         if decrypt :
-            o = shiftBackward(c,t)
-        else:
-            o = shiftForward(c,t)
-        output += o;
+            c = c*-1
+        o = shiftChar(c,ord(t))
+        output += chr(o);
     return output;
 
 def __test(p,t):
@@ -60,45 +70,52 @@ def __test1():
 if __name__ == "__main__":
     import argparse
     import sys
+    import time
         
     parser = argparse.ArgumentParser(description='Encrypt and decrypt using viginere cypher.')
     parser.add_argument('-d', dest='decrypt', default=False, action='store_true',
         help="Use this flag to decrypt text, will encrypt by defualt.")
     parser.add_argument('-e', dest='encrypt', default=True, action='store_true',
         help="The encrypt flag is set by default.")
-    parser.add_argument('-t', dest='text', default="",
-        help="Use this option to input text.")
     parser.add_argument('-i', dest='input_file_name', default=None,
-        help="Use this option to input text from a file, if both t and i options are used, the text input is proritized.")
+        help="Use this option to input text from a file.")
     parser.add_argument('-o', dest='output_file_name', default=None,
         help="Use this option to output text to a file, if not used output is sent to standard out.")
     parser.add_argument('-p', dest='password', default=None,
-        help="Password used to shift text. If none given, the user will be prompted.")
+        help="Password used to shift text. If none given, the user will be prompted.")   
+    parser.add_argument('--test', dest='test', default=False, action='store_true',
+        help=argparse.SUPPRESS)
  
     args = parser.parse_args()
-    text = args.text;
-    if text == "":
+    
+    if args.test:
+        __test0()
+        __test1()
+    else:
+        if args.password == None:
+            sys.stderr.write("Please enter password:")
+            sys.stderr.flush()
+            password = sys.stdin.readline().strip('\n')
+        else:
+            password = args.password
+            
         if args.input_file_name == None:
             # prompt for text
-            sys.stdout.write("Please input line of text to encrypt:")
+            sys.stderr.write("Please input line of text to encrypt:")
+            sys.stderr.flush()
             text = sys.stdin.readline().strip('\n')
         else:
             # get text from file
             input_file = open(args.input_file_name,"r")
             text = input_file.read()
-    
-    output_file = sys.stdout
-    if args.output_file_name != None:
-        output_file = open(args.output_file_name,"w")
-       
-    if args.password == None:
-        sys.stdout.write("Please enter password:")
-        password = sys.stdin.readline().strip('\n')
-    else:
-        password = args.password
+        
+        output_file = sys.stdout
+        if args.output_file_name != None:
+            output_file = open(args.output_file_name,"w")
 
-    output = vigenere(password,text,args.decrypt)
+        output = vigenere(password,text,args.decrypt)
 
-    output_file.write(output)
-    if args.output_file_name == None:
-        print("")
+        output_file.write(output)
+        
+        if args.output_file_name == None:
+            print("")
