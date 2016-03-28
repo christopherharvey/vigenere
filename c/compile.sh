@@ -1,2 +1,2 @@
 #/bin/bash
-gcc vigenere.c -o vigenere.bin
+gcc -std=gnu99 vigenere.c -o vigenere.bin

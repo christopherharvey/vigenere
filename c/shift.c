@@ -68,15 +68,13 @@ void getNumericKeyArrayFromAsciiKeyString(char *asciiKeyString,char *numericKeyA
 void shiftFile(FILE* in,FILE* out, char *numericKeyArray)
 {
 	char *currentKey = numericKeyArray;
-	while(1)
-	{
-		char input = fgetc(stdin);
-		if(input==EOF)break;
+	char input = ' ';
+	while((input = fgetc(in)) != EOF){
 		if(*currentKey==EOK)
 			currentKey = numericKeyArray;
 		char output = shiftChar(input,*(currentKey++)); 
-		fputc(output,stdout);
-	}
+        fputc(output,out);
+    }
 }
 #endif
 
