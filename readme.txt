@@ -10,12 +10,12 @@ This implementation shifts alpha and numeric characters. It does so without mixi
 
 -- Current Lanquages --
         
-c ~ using python 3.4
+c ~ using gcc 4.8.4
      - done
         * core logic
-     - todo 
         * command line interface
         * file operations
+     - todo 
         * make file
         * gui interface
 java ~ using jdk 7+
