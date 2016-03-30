@@ -101,9 +101,9 @@ if __name__ == "__main__":
             
         if args.input_file_name == None:
             # prompt for text
-            sys.stderr.write("Please input line of text to encrypt:")
+            sys.stderr.write("Please input text to encrypt. Use end of file to stop(CTRL d):\n")
             sys.stderr.flush()
-            text = sys.stdin.readline().strip('\n')
+            text = sys.stdin.read()
         else:
             # get text from file
             input_file = open(args.input_file_name,"r")

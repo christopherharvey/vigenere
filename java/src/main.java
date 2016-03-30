@@ -68,7 +68,7 @@ public class main{
             }
         }
         if(password == null){
-            System.err.println("Please enter a password, then press enter.");
+            System.err.print("Please enter a password:");
             Scanner scanner = new Scanner(System.in);
             password = scanner.next();
         }
@@ -93,11 +93,12 @@ public class main{
             }
         }
         if(input_text == null){
-            System.err.println("Please enter a text, then press enter. Enter an empty line to quit.");
+            System.err.println("Please enter a text, then end of file finish (CTRL d).");
             Scanner scanner = new Scanner(new BufferedInputStream(System.in));
             input_text = "";
             String tmp;
-            while((tmp = scanner.nextLine()) != null && tmp.length()!=0){
+            while(scanner.hasNextLine()){
+                tmp = scanner.nextLine();
                 input_text += tmp+'\n';
             }
         }
